@@ -21,7 +21,7 @@ Accordingly, this repo is organized based on the 3 defenses.
 - [codes/](./codes/) contains the codes for training SPACTE with base methods Gaussian, Consistency and SmoothMix, respectively.
 - [logs_certification/](./logs_certification) contains the corresponding certification log data.
 
-Take a close look at the files in [codes/0Gaussian/](./codes/0Gaussian):
+For example, take a close look at the files in [codes/0Gaussian/](./codes/0Gaussian):
 1. `model/*_mhead.py`: model definition of the multi-head DNN
 2. `circular_teaching.py`: main code of SPACTE
 3. `core_mhead.py`: smoothed classifier of the multi-head DNN
