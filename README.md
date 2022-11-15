@@ -8,7 +8,7 @@ The proposed **SPACTE** in our paper is an efficient and effective certifiably-r
 
 The deployed multi-head structure and the circular-teaching scheme of SPACTE jointly contribute to diversify and enhance the classifiers in augmented heads for ensemble, leading to even stronger certified robustness than ensembling multiple DNNs (*effectiveness*) at the cost of much less computational expenses (*efficiency*).
 
-<a href="pics/figure.pdf"><img src="pics/figure.jpg" height="400" width="1000" ></a>
+<a href="pics/figure.pdf"><img src="pics/figure.jpg" height="300" width="1000" ></a>
 
 ## Overview of the Repo
 
