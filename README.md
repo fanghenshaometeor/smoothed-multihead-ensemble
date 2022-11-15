@@ -8,7 +8,8 @@ The proposed **SPACTE** in our paper is an efficient and effective certifiably-r
 
 The deployed multi-head structure and the circular-teaching scheme of SPACTE jointly contribute to diversify and enhance the classifiers in augmented heads for ensemble, leading to even stronger certified robustness than ensembling multiple DNNs (*effectiveness*) at the cost of much less computational expenses (*efficiency*).
 
-<a href="pics/figure.pdf"><img src="pics/figure.jpg" height="350" width="1000" ></a>
+<!-- <a href="pics/figure.pdf"><img src="pics/figure.jpg" height="350" width="1000" ></a> -->
+<a href="pics/figure.pdf"><div align="center"><img src="pics/figure.jpg"></div></a>
 
 ## Overview of the Repo
 
@@ -19,7 +20,7 @@ SPACTE is compatible with all single-model-based certified defenses, among which
 
 Accordingly, this repo is organized based on the 3 defenses.
 - [codes/](./codes/) contains the codes for training SPACTE with base methods Gaussian, Consistency and SmoothMix, respectively.
-- [logs_certification/](./logs_certification) contains the corresponding certification log data.
+- [logs_certification/](./logs_certification) contains the corresponding certification log data of our SPACTE.
 
 For example, take a close look at the files in [codes/0Gaussian/](./codes/0Gaussian):
 1. `model/*_mhead.py`: model definition of the multi-head DNN
