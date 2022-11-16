@@ -1,9 +1,3 @@
-"""
-Created on Fri Sep 30 2022
-
-@author: fanghenshao
-"""
-
 from __future__ import print_function
 
 import torch

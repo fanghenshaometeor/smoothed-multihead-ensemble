@@ -1,9 +1,3 @@
-"""
-Created on Fri Sep 30 2022
-
-@author: fanghenshao
-"""
-
 import torch
 from torch.nn.modules.batchnorm import _BatchNorm
 

@@ -1,9 +1,3 @@
-"""
-Created on Sat Oct 01 2022
-
-@author: fanghenshao
-"""
-import os
 import math
 import torch
 import torch.nn as nn

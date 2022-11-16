@@ -1,10 +1,3 @@
-"""
-Created on Fri Sep 30 2022
-
-@author: fanghenshao
-"""
-
-from multiprocessing.heap import reduce_arena
 import torch
 import torch.nn.functional as F 
 
