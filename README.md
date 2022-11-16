@@ -24,7 +24,7 @@ Accordingly, this repo is organized based on the 3 defenses.
 
 For example, take a close look at the files in [codes/0Gaussian/](./codes/0Gaussian):
 1. `model/*_mhead.py`: model definitions of the multi-head DNN
-2. `circular_teaching.py`: main code sof SPACTE
+2. `circular_teaching.py`: main codes of SPACTE
 3. `core_mhead.py`: smoothed classifier of the multi-head DNN
 4. `certify_mhead.py`: certification script
 5. `train.py`: training script
@@ -53,10 +53,17 @@ CUDA_VISIBLE_DEVICES=0 python train.py --arch R110 --dataset CIFAR10 --data_dir 
 CUDA_VISIBLE_DEVICES=0 python certify_mhead.py --arch R110 --dataset CIFAR10 --data_dir $data_dir$ --model_path './save/CIFAR10/R110/noise-0.25/h-5-eps-0.8-m-2-lbdlast-1.2/epoch150.pth' --noise_sd 0.25 --skip 20 --num_heads 5
 ```
 - By running the `train.py` script, the models are by default saved in the created folder `./save/CIFAR10/R110/noise-0.25/h-5-eps-0.8-m-2-lbdlast-1.2/`. In addition, two folders `./logs/` and `./runs/` are also created to record the training information.
-- By running the `certify_mhead.py` script, the corresponding logs are by default saved in the created folder `./logs/CIFAR10/R110/noise-0.25/certify-mhead/`, including the detailed certified radius on each sample, the ACR and the approximated certified accuracy at given radii.
+- By running the `certify_mhead.py` script, the corresponding logs are by default saved in the created folder `./logs/CIFAR10/R110/noise-0.25/certify-mhead/`, including the detailed certified radius of each sample, the ACR and the approximated certified accuracy at given radii.
 
-A full collection of all the training and certification commands can be found in [EXPERIMENTS.md](./EXPERIMENTS.md).
+A full collection of all the training and certification commands can be found in [EXPERIMENTS.md](./EXPERIMENTS.md), where the detailed values of all the involved hyper-parameters in experiments are presented.
 
 ## Pre-trained models
 
-## References
+The pre-trained models will be released soon.
+
+## Additional references
+We list below the 2 certifiably-robust ensemble defenses and other 2 single-model-based certified defenses discussed in our paper.
+- Horv${\'a}$th *et al*. (ICLR'22) [[paper](https://arxiv.org/abs/2106.06946), [code](https://github.com/eth-sri/smoothing-ensembles)]
+- Yang *et al*. (ICLR'22) [[paper](https://arxiv.org/abs/2107.10873), [code](https://openreview.net/attachment?id=tUa4REjGjTf&name=supplementary_material)]
+- MACER (ICLR'20) [[paper](https://arxiv.org/abs/2001.02378), [code](https://github.com/RuntianZ/macer)]
+- SmoothAdv(NeurIPS'19) [[paper](https://arxiv.org/abs/1906.04584), [code](https://github.com/Hadisalman/smoothing-adversarial)]
