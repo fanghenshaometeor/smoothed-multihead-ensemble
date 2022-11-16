@@ -31,8 +31,9 @@ For example, take a close look at the files in [codes/0Gaussian/](./codes/0Gauss
 6. `utils.py`: utility functions
 
 ## Getting started
-1. `git clone https://github.com/fanghenshaometeor/Circular-teaching.git`
-2. Install dependencies
+<!-- 1. `git clone https://github.com/fanghenshaometeor/Circular-teaching.git` -->
+<!-- 2. Install dependencies -->
+Install dependencies
 ```
 conda create -n spacte python=3.6
 conda activate spacte
