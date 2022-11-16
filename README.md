@@ -57,13 +57,13 @@ CUDA_VISIBLE_DEVICES=0 python certify_mhead.py --arch R110 --dataset CIFAR10 --d
 
 A full collection of all the training and certification commands can be found in [EXPERIMENTS.md](./EXPERIMENTS.md), where the detailed values of all the involved hyper-parameters in experiments are presented.
 
-## Pre-trained models
+## SPACTE-trained models
 
-The pre-trained models will be released soon.
+Our trained models of SPACTE will be released soon.
 
 ## Additional references
 We list below the 2 certifiably-robust ensemble defenses and other 2 single-model-based certified defenses discussed in our paper.
 - Horv${\'a}$th *et al*. (ICLR'22): naive ensemble of multiple DNNs trained from different random seeds. [[paper](https://arxiv.org/abs/2106.06946), [code](https://github.com/eth-sri/smoothing-ensembles)]
 - Yang *et al*. (ICLR'22): fine-tuning multiple well-pretrained models via diversified gradient and large confidence margin. [[paper](https://arxiv.org/abs/2107.10873), [code](https://openreview.net/attachment?id=tUa4REjGjTf&name=supplementary_material)]
-- MACER (ICLR'20): regularization-based certified defense by directly maximizing the certified radius. [[paper](https://arxiv.org/abs/2001.02378), [code](https://github.com/RuntianZ/macer)]
-- SmoothAdv(NeurIPS'19):  [[paper](https://arxiv.org/abs/1906.04584), [code](https://github.com/Hadisalman/smoothing-adversarial)]
+- MACER (ICLR'20): regularization-based by directly maximizing the certified radius. [[paper](https://arxiv.org/abs/2001.02378), [code](https://github.com/RuntianZ/macer)]
+- SmoothAdv(NeurIPS'19): data-augmentation-based by involving the adversarial examples of the smoothed classifier into training. [[paper](https://arxiv.org/abs/1906.04584), [code](https://github.com/Hadisalman/smoothing-adversarial)]
