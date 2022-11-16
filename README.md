@@ -47,9 +47,9 @@ Let us see an example how to train and certifiy a 5-head ResNet-110 via SPACTE u
 ```
 cd Circular-teaching
 cd codes/0Gaussian
-
+# training
 CUDA_VISIBLE_DEVICES=0 python train.py --arch R110 --dataset CIFAR10 --data_dir $data_dir$ --noise_sd 0.25 --num_heads 5 --num_noise_vec 2 --lbdlast 1.2
-
+# certification
 CUDA_VISIBLE_DEVICES=0 python certify_mhead.py --arch R110 --dataset CIFAR10 --data_dir $data_dir$ --model_path './save/CIFAR10/R110/noise-0.25/h-5-eps-0.8-m-2-lbdlast-1.2/epoch150.pth' --noise_sd 0.25 --skip 20 --num_heads 5
 ```
 - By running the `train.py` script, the models are by default saved in the created folder `./save/CIFAR10/R110/noise-0.25/h-5-eps-0.8-m-2-lbdlast-1.2/`. In addition, two folders, `./logs/` and `./runs/`, are also created to record the training information.
