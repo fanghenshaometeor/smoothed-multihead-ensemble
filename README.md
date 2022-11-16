@@ -52,7 +52,7 @@ CUDA_VISIBLE_DEVICES=0 python train.py --arch R110 --dataset CIFAR10 --data_dir 
 
 CUDA_VISIBLE_DEVICES=0 python certify_mhead.py --arch R110 --dataset CIFAR10 --data_dir $data_dir$ --model_path './save/CIFAR10/R110/noise-0.25/h-5-eps-0.8-m-2-lbdlast-1.2/epoch150.pth' --noise_sd 0.25 --skip 20 --num_heads 5
 ```
-- By running the `train.py` script, the models are by default saved in the created folder `./save/CIFAR10/R110/noise-0.25/h-5-eps-0.8-m-2-lbdlast-1.2/`. In addition, two folders `./logs/` and `./runs/` are also created to record the training information.
+- By running the `train.py` script, the models are by default saved in the created folder `./save/CIFAR10/R110/noise-0.25/h-5-eps-0.8-m-2-lbdlast-1.2/`. In addition, two folders, `./logs/` and `./runs/`, are also created to record the training information.
 - By running the `certify_mhead.py` script, the corresponding logs are by default saved in the created folder `./logs/CIFAR10/R110/noise-0.25/certify-mhead/`, including the detailed certified radius of each sample, the ACR and the approximated certified accuracy at given radii.
 
 A full collection of all the training and certification commands can be found in [EXPERIMENTS.md](./EXPERIMENTS.md), where the detailed values of all the involved hyper-parameters in experiments are presented.
@@ -63,7 +63,7 @@ Our trained models of SPACTE will be released soon.
 
 ## Additional references
 We list below the 2 certifiably-robust ensemble defenses and other 2 single-model-based certified defenses discussed in our paper.
-- Horv${\'a}$th *et al*. (ICLR'22): naive ensemble of multiple DNNs trained from different random seeds. [[paper](https://arxiv.org/abs/2106.06946), [code](https://github.com/eth-sri/smoothing-ensembles)]
-- Yang *et al*. (ICLR'22): fine-tuning multiple well-pretrained models via diversified gradient and large confidence margin. [[paper](https://arxiv.org/abs/2107.10873), [code](https://openreview.net/attachment?id=tUa4REjGjTf&name=supplementary_material)]
+- Horv${\'a}$th et al. (ICLR'22): naive ensemble of multiple DNNs trained from different random seeds. [[paper](https://arxiv.org/abs/2106.06946), [code](https://github.com/eth-sri/smoothing-ensembles)]
+- Yang et al. (ICLR'22): fine-tuning multiple well-pretrained models via diversified gradient and large confidence margin. [[paper](https://arxiv.org/abs/2107.10873), [code](https://openreview.net/attachment?id=tUa4REjGjTf&name=supplementary_material)]
 - MACER (ICLR'20): regularization-based by directly maximizing the certified radius. [[paper](https://arxiv.org/abs/2001.02378), [code](https://github.com/RuntianZ/macer)]
 - SmoothAdv(NeurIPS'19): data-augmentation-based by involving the adversarial examples of the smoothed classifier into training. [[paper](https://arxiv.org/abs/1906.04584), [code](https://github.com/Hadisalman/smoothing-adversarial)]
