@@ -44,7 +44,7 @@ parser.add_argument('--noise_sd',default=0.0,type=float,help="standard deviation
 # -------- multi-head param. --------
 parser.add_argument('--num_heads',type=int,default=10,help='number of heads')
 parser.add_argument('--alpha',type=float,default=1.0,help='coefficient of the cosine regularization term')
-parser.add_argument('--eps',type=float,default=5e-2,help='epsilon to control weight distribution')
+parser.add_argument('--eps',type=float,default=0.8,help='epsilon to control weight distribution')
 parser.add_argument('--num_noise_vec',default=2,type=int,help="number of noise vectors. `m` in the paper.")
 parser.add_argument('--lbdlast',type=float,default=0.5,help='the last value of lambda')
 # -------- smoothmix --------
