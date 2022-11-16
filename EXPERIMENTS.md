@@ -57,7 +57,7 @@ CUDA_VISIBLE_DEVICES=0 python train.py --arch R110 --dataset CIFAR10 --data_dir 
 CUDA_VISIBLE_DEVICES=0 python certify_mhead.py --arch R110 --dataset CIFAR10 --data_dir $data_dir$ --model_path './save/CIFAR10/R110/noise-1.0/h-5-eps-0.8-m-2-lbdlast-1.0-lbd-10.0/epoch150.pth' --noise_sd 1.0 --skip 20 --num_heads 5
 ```
 
-The argument `--lbd` is the hyper-parameter $\lambda$ in Consistency. Following the original paper of Consistency, we choose $\lambda=20$ for $\sigma=0.25$, and $\lambda=10$ for $\sigma\in\{0.5,1.0\}$.
+The argument `--lbd` is the hyper-parameter $\lambda$ in Consistency. Following the original paper of Consistency, we choose $\lambda=20$ for $\sigma=0.25$, and $\lambda=10$ for $\sigma=0.5$ and $\sigma=1.0$.
 
 ## SPACTE-SmoothMix
 
