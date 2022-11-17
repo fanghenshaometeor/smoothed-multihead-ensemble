@@ -20,7 +20,7 @@ SPACTE is compatible with all single-model-based certified defenses, among which
 
 Accordingly, this repo is organized based on the 3 defenses.
 - [codes/](./codes/) contains the codes for training SPACTE with base methods Gaussian ([codes/0Gaussian/](./codes/0Gaussian)), Consistency ([codes/1Consistency/](./codes/1Consistency)) and SmoothMix ([codes/2SmoothMix/](./codes/2SmoothMix)), respectively.
-- [logs_certification/](./logs_certification) provides the corresponding certification log data of our SPACTE.
+- [logs_certification/](./logs_certification) provides the corresponding certification log data of our SPACTE models.
 
 For example, take a close look at the files in [codes/0Gaussian/](./codes/0Gaussian):
 1. `model/*_mhead.py`: model definitions of the multi-head DNN
@@ -42,7 +42,7 @@ pip install pandas, scipy, statsmodels, tensorboard
 ```
 
 ## Examples
-Let us see an example how to train and certifiy a 5-head ResNet-110 via SPACTE upon the Gaussian baseline on CIFAR10 with a noise level $\sigma=0.25$.
+Let us see an example on how to train and certifiy a 5-head ResNet-110 via SPACTE upon the Gaussian baseline on CIFAR10 with a noise level $\sigma=0.25$.
 
 ### Training and certification
 ```
