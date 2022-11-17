@@ -16,17 +16,15 @@ from utils import get_datasets, get_model, get_model_mhead
 from utils import Logger
 from utils import AverageMeter, accuracy
 
-# from circular_teaching import ct_loss, log10_scheduler
-# from consistency import consistency_loss
 from circular_teaching_consistency import ct_con_loss, log10_scheduler
 
 # ======== fix data type ========
 torch.set_default_tensor_type(torch.FloatTensor)
 
 # ======== options ==============
-parser = argparse.ArgumentParser(description='Training DIO')
+parser = argparse.ArgumentParser(description='Training SPACTE')
 # -------- file param. --------------
-parser.add_argument('--data_dir',type=str,default='/media/Disk1/KunFang/data/CIFAR10/',help='file path for data')
+parser.add_argument('--data_dir',type=str,default='/data/CIFAR10/',help='file path for data')
 parser.add_argument('--logs_dir',type=str,default='./logs/',help='folder to store logs')
 parser.add_argument('--save_dir',type=str,default='./save/',help='folder to save model')
 parser.add_argument('--runs_dir',type=str,default='./runs/',help='folder to save tensorboard')

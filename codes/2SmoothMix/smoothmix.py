@@ -49,9 +49,9 @@ class SmoothMix_PGD(object):
 
             # loss = F.nll_loss(logsoftmax, labels, reduction='sum')
 
-            ######## #### ########
-            ######## #### ########
-            ######## eDIO ########
+            ######## ##### ########
+            ######## ##### ########
+            ######## mhead ########
             all_logits = [model(adv+noise) for noise in noises]
             m = len(noises)
             num_heads = model[1].num_heads
@@ -64,9 +64,9 @@ class SmoothMix_PGD(object):
                 logsoftmax_i_head = torch.log(avgsoftmax_i_head.clamp(min=1e-20))
                 loss = loss + F.nll_loss(logsoftmax_i_head, labels, reduction='sum')/num_heads
 
-            ######## eDIO ########
-            ######## #### ########
-            ######## #### ########
+            ######## mhead ########
+            ######## ##### ########
+            ######## ##### ########
 
             grad = torch.autograd.grad(loss, [adv])[0]
             grad_norm = _batch_l2norm(grad).view(-1, 1, 1, 1)

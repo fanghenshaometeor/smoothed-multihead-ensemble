@@ -24,9 +24,9 @@ from smoothmix import SmoothMix_PGD
 torch.set_default_tensor_type(torch.FloatTensor)
 
 # ======== options ==============
-parser = argparse.ArgumentParser(description='Training DIO')
+parser = argparse.ArgumentParser(description='Training SPACTE')
 # -------- file param. --------------
-parser.add_argument('--data_dir',type=str,default='/media/Disk1/KunFang/data/CIFAR10/',help='file path for data')
+parser.add_argument('--data_dir',type=str,default='/data/CIFAR10/',help='file path for data')
 parser.add_argument('--logs_dir',type=str,default='./logs/',help='folder to store logs')
 parser.add_argument('--save_dir',type=str,default='./save/',help='folder to save model')
 parser.add_argument('--runs_dir',type=str,default='./runs/',help='folder to save tensorboard')

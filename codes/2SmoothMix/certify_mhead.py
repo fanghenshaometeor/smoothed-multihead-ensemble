@@ -22,9 +22,9 @@ from core_mhead import Smooth
 torch.set_default_tensor_type(torch.FloatTensor)
 
 # ======== options ==============
-parser = argparse.ArgumentParser(description='Certify DIO ensemble')
+parser = argparse.ArgumentParser(description='Certify m-head ensemble')
 # -------- file param. --------------
-parser.add_argument('--data_dir',type=str,default='/media/Disk1/KunFang/data/CIFAR10/',help='file path for data')
+parser.add_argument('--data_dir',type=str,default='/data/CIFAR10/',help='file path for data')
 parser.add_argument('--logs_dir',type=str,default='./logs/',help='folder to store logs')
 parser.add_argument('--dataset',type=str,default='CIFAR10',help='data set name')
 parser.add_argument('--arch',type=str,default='vgg16',help='model architecture')
@@ -100,7 +100,7 @@ def main():
     elif args.dataset == 'ImageNet':
         radii = np.arange(0,4.0,0.5)
     certified = ApproAcc.at_radii(radii)*100
-    f = open(args.logs_path.replace("skip-%d"%args.skip, "ACR"), 'w')
+    f = open(args.logs_path.replace(".log", "-ACR.log"), 'w')
     print('\n-------- Log-path: {}'.format(args.logs_path), file=f, flush=True)
     print('\n-------- ACR = %.3f '%ApproAcc.acr(), file=f, flush=True)
     for idx, radius in enumerate(radii):
