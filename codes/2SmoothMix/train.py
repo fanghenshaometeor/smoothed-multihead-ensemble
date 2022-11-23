@@ -24,31 +24,29 @@ from smoothmix import SmoothMix_PGD
 torch.set_default_tensor_type(torch.FloatTensor)
 
 # ======== options ==============
-parser = argparse.ArgumentParser(description='Training SPACTE')
+parser = argparse.ArgumentParser(description='Training SPACTE with SmoothMix')
 # -------- file param. --------------
-parser.add_argument('--data_dir',type=str,default='/data/CIFAR10/',help='file path for data')
-parser.add_argument('--logs_dir',type=str,default='./logs/',help='folder to store logs')
-parser.add_argument('--save_dir',type=str,default='./save/',help='folder to save model')
-parser.add_argument('--runs_dir',type=str,default='./runs/',help='folder to save tensorboard')
+parser.add_argument('--data_dir',type=str,default='./data/CIFAR10/',help='data directory')
+parser.add_argument('--logs_dir',type=str,default='./logs/',help='logs directory')
+parser.add_argument('--save_dir',type=str,default='./save/',help='model saving directory')
+parser.add_argument('--runs_dir',type=str,default='./runs/',help='tensorboard saving directory')
 parser.add_argument('--dataset',type=str,default='CIFAR10',help='data set name')
-parser.add_argument('--arch',type=str,default='vgg16',help='model architecture')
 # -------- training param. ----------
+parser.add_argument('--noise_sd',default=0.0,type=float,help="standard deviation of Gaussian noise")
 parser.add_argument('--batch_size',type=int,default=256,help='batch size for training (default: 256)')    
 parser.add_argument('--lr_init',type=float,default=0.1,help='learning rate (default: 0.1)')
 parser.add_argument('--wd',type=float,default=1e-4,help='weight decay')
-parser.add_argument('--epochs',type=int,default=150,help='number of epochs to train (default: 100)')
-parser.add_argument('--save_freq',type=int,default=40,help='model save frequency (default: 20 epoch)')
 parser.add_argument('--lr_step_size',type=int,default=50,help='How often to decrease learning by gamma.')
 parser.add_argument('--gamma',type=float,default=0.1,help='LR is multiplied by gamma on schedule.')
-parser.add_argument('--noise_sd',default=0.0,type=float,help="standard deviation of Gaussian noise for data augmentation")
+parser.add_argument('--epochs',type=int,default=150,help='number of epochs to train')
+parser.add_argument('--save_freq',type=int,default=40,help='model save frequency')
 # -------- multi-head param. --------
+parser.add_argument('--arch',type=str,default='vgg16',help='model architecture')
 parser.add_argument('--num_heads',type=int,default=10,help='number of heads')
-parser.add_argument('--alpha',type=float,default=1.0,help='coefficient of the cosine regularization term')
-parser.add_argument('--eps',type=float,default=0.8,help='epsilon to control weight distribution')
 parser.add_argument('--num_noise_vec',default=2,type=int,help="number of noise vectors. `m` in the paper.")
 parser.add_argument('--lbdlast',type=float,default=0.5,help='the last value of lambda')
-# -------- smoothmix --------
-# Attack params
+parser.add_argument('--eps',type=float,default=0.8,help='epsilon to control weight distribution')
+# -------- smoothmix param. --------
 parser.add_argument('--attack_alpha',default=1.0,type=float,help="step-size for adversarial attacks.")
 parser.add_argument('--num_steps',default=8,type=int,help="number of attack updates. `T` in the paper.")
 parser.add_argument('--eta',default=1.0,type=float,help="hyperparameter to control the relative strength of the mixup loss.")
@@ -101,6 +99,7 @@ def main():
     
     print('-------- START TRAINING --------')
     for epoch in range(1, args.epochs+1):
+
         args.warmup_v = np.min([1.0, epoch / args.warmup])
         attacker.maxnorm_s = args.warmup_v * args.maxnorm_s
 
@@ -172,7 +171,7 @@ def train_epoch(net, trainloader, optimizer, epoch, attacker):
     requires_grad_(net, True)
 
     batch_time = AverageMeter()
-    losses, losses_ortho, losses_mix = AverageMeter(), AverageMeter(), AverageMeter()
+    losses, losses_ortho = AverageMeter(), AverageMeter()
     losses_ce = []
     for idx in range(args.num_heads):
         losses_ce.append(AverageMeter())
@@ -195,68 +194,23 @@ def train_epoch(net, trainloader, optimizer, epoch, attacker):
             net.train()
             requires_grad_(net, True)
 
-            # -------- get clean and compute loss
-            in_clean_c = torch.cat([b_data + noise for noise in noises], dim=0)
-            all_logits_c = net(in_clean_c)
-            # b_label_c = b_label.repeat(args.num_noise_vec)
-
-            # -------- compute the ce loss via circular-teaching
-            all_logits_c_chunk = [torch.chunk(logits_c, args.num_noise_vec, dim=0) for logits_c in all_logits_c]
-
+            # -------- compute the ce loss via self-paced circular-teaching
             threshold = log10_scheduler(current_epoch=epoch, total_epoch=args.epochs, num_classes=args.num_classes, lbd_last=args.lbdlast)
-            loss_ce, all_losses, coeffs_head = ct_loss(all_logits_c_chunk, b_label, args.eps, threshold)
+            loss_ce, all_losses, loss_mixup = ct_loss(net, b_data, b_data_adv, noises, b_label, args.num_classes, args.num_noise_vec, args.eps, threshold)
             for idx in range(args.num_heads):
                 losses_ce[idx].update(all_losses[idx].float().item(), b_data.size(0))
 
-
-            # -------- get clean avg. softmax for each head
-            clean_avg_sm = _avg_softmax(all_logits_c_chunk)
-            clean_avg_sm = sum([clean_avg_sm[idx]*coeffs_head[idx] for idx in range(args.num_heads)])
-
-            in_mix, targets_mix = _mixup_data(b_data, b_data_adv, clean_avg_sm, args.num_classes)
-            in_mix_c = torch.cat([in_mix + noise for noise in noises], dim=0)
-            targets_mix_c = targets_mix.repeat(args.num_noise_vec, 1)
-            all_logits_mix = [F.log_softmax(logit,dim=1) for logit in net(in_mix_c)]
-
-            _, top1_idx = torch.topk(clean_avg_sm, 1)
-            ind_correct = (top1_idx[:, 0] == b_label).float()
-            ind_correct = ind_correct.repeat(args.num_noise_vec)
-
-            # loss_mixup = F.kl_div(logits_mix_c, targets_mix_c, reduction='none').sum(1)
-            loss_mixup = [(ind_correct * F.kl_div(logits_mix, targets_mix_c, reduction='none').sum(1)).mean() for logits_mix in all_logits_mix]
-            # loss = loss_xent.mean() + args.eta * args.warmup_v * (ind_correct * loss_mixup).mean()
-            loss_mixup = sum(loss_mixup[idx]*coeffs_head[idx] for idx in range(args.num_heads))
-
-
-
-
-
-
-
-
-
-
-
-            #####################################################################################################
-            # b_data_c = torch.cat([b_data + noise for noise in noises], dim=0)
-
-            # all_logits = net(b_data_c)
-
-            # # -------- compute the ce loss via circular-teaching
-            # all_logits_chunk = [torch.chunk(logits, args.num_noise_vec, dim=0) for logits in all_logits]
-
-            # threshold = log10_scheduler(current_epoch=epoch, total_epoch=args.epochs, num_classes=args.num_classes, lbd_last=args.lbdlast)
-            # loss_ce, all_losses = ct_loss(all_logits_chunk, b_label, args.eps, threshold)
-            # for idx in range(args.num_heads):
-            #     losses_ce[idx].update(all_losses[idx].float().item(), b_data.size(0))
-            
             # -------- compute the ORTHOGONALITY constraint
             loss_ortho = .0
-            if args.num_heads > 1:
+            if args.num_heads > 1 and args.dataset == 'CIFAR10':
                 loss_ortho = net[1].compute_cosin_loss()
+            if args.num_heads > 1 and args.dataset == 'ImageNet':
+                loss_ortho = net[1].module.compute_cosin_loss()
+            if args.num_heads <= 1:
+                assert False, "number of heads should be greater than 1."
 
-            # -------- SUM the two losses
-            total_loss = loss_ce + args.alpha * loss_ortho + args.eta * args.warmup_v * loss_mixup
+            # -------- SUM the losses
+            total_loss = loss_ce + loss_ortho + args.eta * args.warmup_v * loss_mixup
         
             # -------- backprop. & update
             optimizer.zero_grad()

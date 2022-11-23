@@ -27,7 +27,6 @@ parser = argparse.ArgumentParser(description='Certify m-head ensemble')
 parser.add_argument('--data_dir',type=str,default='./data/CIFAR10/',help='data directory')
 parser.add_argument('--logs_dir',type=str,default='./logs/',help='logs directory')
 parser.add_argument('--dataset',type=str,default='CIFAR10',help='data set name')
-parser.add_argument('--arch',type=str,default='vgg16',help='model architecture')
 parser.add_argument('--model_path',type=str,default='./save/CIFAR10-VGG.pth',help='saved model path')
 # -------- certify --------
 parser.add_argument('--noise_sd',default=0.0,type=float,help="standard deviation of Gaussian noise")
@@ -38,6 +37,7 @@ parser.add_argument("--N0", type=int, default=100)
 parser.add_argument("--N", type=int, default=100000, help="number of samples to use")
 parser.add_argument("--alpha", type=float, default=0.001, help="failure probability")
 # -------- mhead --------
+parser.add_argument('--arch',type=str,default='vgg16',help='model architecture')
 parser.add_argument('--num_heads',type=int,default=10,help='number of orthogonal paths')
 args = parser.parse_args()
 

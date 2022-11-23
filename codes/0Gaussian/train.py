@@ -22,29 +22,28 @@ from circular_teaching import ct_loss, log10_scheduler
 torch.set_default_tensor_type(torch.FloatTensor)
 
 # ======== options ==============
-parser = argparse.ArgumentParser(description='Training SPACTE')
+parser = argparse.ArgumentParser(description='Training SPACTE with Gaussian')
 # -------- file param. --------------
-parser.add_argument('--data_dir',type=str,default='/data/CIFAR10/',help='file path for data')
-parser.add_argument('--logs_dir',type=str,default='./logs/',help='folder to store logs')
-parser.add_argument('--save_dir',type=str,default='./save/',help='folder to save model')
-parser.add_argument('--runs_dir',type=str,default='./runs/',help='folder to save tensorboard')
+parser.add_argument('--data_dir',type=str,default='./data/CIFAR10/',help='data directory')
+parser.add_argument('--logs_dir',type=str,default='./logs/',help='logs directory')
+parser.add_argument('--save_dir',type=str,default='./save/',help='model saving directory')
+parser.add_argument('--runs_dir',type=str,default='./runs/',help='tensorboard saving directory')
 parser.add_argument('--dataset',type=str,default='CIFAR10',help='data set name')
-parser.add_argument('--arch',type=str,default='vgg16',help='model architecture')
 # -------- training param. ----------
+parser.add_argument('--noise_sd',default=0.0,type=float,help="standard deviation of Gaussian noise")
 parser.add_argument('--batch_size',type=int,default=256,help='batch size for training (default: 256)')    
-parser.add_argument('--lr_init',type=float,default=0.1,help='learning rate (default: 0.1)')
+parser.add_argument('--lr_init',type=float,default=0.1,help='init. learning rate (default: 0.1)')
 parser.add_argument('--wd',type=float,default=1e-4,help='weight decay')
-parser.add_argument('--epochs',type=int,default=150,help='number of epochs to train (default: 100)')
-parser.add_argument('--save_freq',type=int,default=40,help='model save frequency (default: 20 epoch)')
 parser.add_argument('--lr_step_size',type=int,default=50,help='How often to decrease learning by gamma.')
 parser.add_argument('--gamma',type=float,default=0.1,help='LR is multiplied by gamma on schedule.')
-parser.add_argument('--noise_sd',default=0.0,type=float,help="standard deviation of Gaussian noise for data augmentation")
+parser.add_argument('--epochs',type=int,default=150,help='number of epochs to train')
+parser.add_argument('--save_freq',type=int,default=40,help='model save frequency')
 # -------- multi-head param. --------
+parser.add_argument('--arch',type=str,default='vgg16',help='model architecture')
 parser.add_argument('--num_heads',type=int,default=10,help='number of heads')
-parser.add_argument('--alpha',type=float,default=1.0,help='coefficient of the cosine regularization term')
-parser.add_argument('--eps',type=float,default=0.8,help='epsilon to control weight distribution')
 parser.add_argument('--num_noise_vec',default=2,type=int,help="number of noise vectors. `m` in the paper.")
 parser.add_argument('--lbdlast',type=float,default=0.5,help='the last value of lambda')
+parser.add_argument('--eps',type=float,default=0.8,help='epsilon to control weight distribution')
 
 args = parser.parse_args()
 
@@ -143,10 +142,9 @@ def train_epoch(net, trainloader, optimizer, epoch):
             b_data_c = torch.cat([b_data + noise for noise in noises], dim=0)
 
             all_logits = net(b_data_c)
-
-            # -------- compute the ce loss via circular-teaching
             all_logits_chunk = [torch.chunk(logits, args.num_noise_vec, dim=0) for logits in all_logits]
 
+            # -------- compute the ce loss via self-paced circular-teaching
             threshold = log10_scheduler(current_epoch=epoch, total_epoch=args.epochs, num_classes=args.num_classes, lbd_last=args.lbdlast)
             loss_ce, all_losses = ct_loss(all_logits_chunk, b_label, args.eps, threshold)
             for idx in range(args.num_heads):
@@ -158,9 +156,12 @@ def train_epoch(net, trainloader, optimizer, epoch):
                 loss_ortho = net[1].compute_cosin_loss()
             if args.num_heads > 1 and args.dataset == 'ImageNet':
                 loss_ortho = net[1].module.compute_cosin_loss()
+            if args.num_heads <= 1:
+                assert False, "number of heads should be greater than 1."
+
 
             # -------- SUM the two losses
-            total_loss = loss_ce + args.alpha * loss_ortho
+            total_loss = loss_ce + loss_ortho
         
             # -------- backprop. & update
             optimizer.zero_grad()
