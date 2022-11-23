@@ -13,7 +13,7 @@ import argparse
 import numpy as np
 
 from utils import setup_seed
-from utils import get_datasets, get_model, get_model_mhead
+from utils import get_datasets, get_model_mhead
 from utils import Logger
 from utils import AverageMeter, accuracy
 

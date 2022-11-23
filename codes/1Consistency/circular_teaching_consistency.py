@@ -18,7 +18,7 @@ def log10_scheduler(current_epoch, total_epoch, num_classes, lbd_last=0.5):
 
     return - math.log(a * current_epoch + b, 10)
 
-def ct_con_loss(all_logits_chunk, label, eps, threshold, lbd, eta=0.5, loss='default'):
+def ct_con_loss(all_logits_chunk, label, eps, threshold, lbd, eta=0.5):
     
     num_heads = len(all_logits_chunk)
     m = len(all_logits_chunk[0])
