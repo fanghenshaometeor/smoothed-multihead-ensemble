@@ -34,14 +34,14 @@ def ct_loss(all_logits_chunk, label, eps, threshold=0.5):
                 avg_loss += F.cross_entropy(logits, label, reduction='none')
             avg_loss = avg_loss / m
             avg_losses.append(avg_loss)
-        # -------- circular-teaching among heads
+        # -------- circular-teaching among heads, self-paced learning
         for head_idx, avg_loss in enumerate(avg_losses):
             coeff_spl = avg_loss.lt(threshold).float()  # <-- easy samples with coeffs. 1
             hard_idx = avg_loss.gt(threshold)           # <-- hard samples
             coeff_spl[hard_idx] = (1+math.exp(-threshold))/(1+torch.exp(avg_losses[head_idx-num_heads+1][hard_idx]-threshold)) # <-- key codes
             coeffs_spl.append(coeff_spl)
     
-    # -------- circular-teaching among heads, weighted sample loss
+    # -------- circular-teaching among heads, self-paced weighted sample loss
     losses = []
     for head_idx, logits_chunk in enumerate(all_logits_chunk):
         loss = sum([F.cross_entropy(logits, label, reduction='none') for logits in logits_chunk]) / m

@@ -43,7 +43,7 @@ def log10_scheduler(current_epoch, total_epoch, num_classes, lbd_last=0.5):
     return - math.log(a * current_epoch + b, 10)
 
 
-def ct_loss(net, b_data, b_data_adv, noises, label, num_classes, num_noise_vec, eps, threshold=0.5):
+def ct_mix_loss(net, b_data, b_data_adv, noises, label, num_classes, num_noise_vec, eps, threshold=0.5):
     m = num_noise_vec
     # -------- get clean and compute loss
     in_clean_c = torch.cat([b_data + noise for noise in noises], dim=0)
@@ -63,14 +63,14 @@ def ct_loss(net, b_data, b_data_adv, noises, label, num_classes, num_noise_vec, 
                 avg_loss += F.cross_entropy(logits, label, reduction='none')
             avg_loss = avg_loss / m
             avg_losses.append(avg_loss)
-        # -------- circular-teaching among heads
+        # -------- circular-teaching among heads, self-paced learning
         for head_idx, avg_loss in enumerate(avg_losses):
             coeff_spl = avg_loss.lt(threshold).float()  # <-- easy samples with coeffs. 1
             hard_idx = avg_loss.gt(threshold)           # <-- hard samples
             coeff_spl[hard_idx] = (1+math.exp(-threshold))/(1+torch.exp(avg_losses[head_idx-num_heads+1][hard_idx]-threshold)) # <-- key codes
             coeffs_spl.append(coeff_spl)
     
-    # -------- circular-teaching among heads, weighted sample loss
+    # -------- circular-teaching among heads, self-paced weighted sample loss
     losses = []
     for head_idx, logits_chunk in enumerate(all_logits_c_chunk):
         loss = sum([F.cross_entropy(logits, label, reduction='none') for logits in logits_chunk]) / m
@@ -107,7 +107,6 @@ def ct_loss(net, b_data, b_data_adv, noises, label, num_classes, num_noise_vec, 
     # -------- create mixed data
     in_mix, targets_mix = _mixup_data(b_data, b_data_adv, clean_avg_sm, num_classes)
     in_mix_c = torch.cat([in_mix + noise for noise in noises], dim=0)
-    # targets_mix_c = targets_mix.repeat(m, 1)
     all_logits_mix = [F.log_softmax(logit,dim=1) for logit in net(in_mix_c)]
     all_logits_mix_chunk = [torch.chunk(logits_mix, num_noise_vec, dim=0) for logits_mix in all_logits_mix]
 

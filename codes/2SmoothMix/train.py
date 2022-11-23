@@ -17,7 +17,7 @@ from utils import get_datasets, get_model, get_model_mhead
 from utils import Logger
 from utils import AverageMeter, accuracy
 
-from circular_teaching_smoothmix import ct_loss, log10_scheduler
+from circular_teaching_smoothmix import ct_mix_loss, log10_scheduler
 from smoothmix import SmoothMix_PGD
 
 # ======== fix data type ========
@@ -142,30 +142,6 @@ def _chunk_minibatch(batch, num_batches):
     for i in range(num_batches):
         yield X[i*batch_size : (i+1)*batch_size], y[i*batch_size : (i+1)*batch_size]
 
-def _mixup_data(x1, x2, y1, n_classes):
-    '''Returns mixed inputs, pairs of targets, and lambda'''
-    device = x1.device
-
-    _eye = torch.eye(n_classes, device=device)
-    _unif = _eye.mean(0, keepdim=True)
-    lam = torch.rand(x1.size(0), device=device) / 2
-
-    mixed_x = (1 - lam).view(-1, 1, 1, 1) * x1 + lam.view(-1, 1, 1, 1) * x2
-    mixed_y = (1 - lam).view(-1, 1) * y1 + lam.view(-1, 1) * _unif
-
-    return mixed_x, mixed_y
-
-# modified for mhead
-def _avg_softmax(all_logits):
-    num_heads = len(all_logits)
-    m = len(all_logits[0])
-    # obtain avg. softmax of each head
-    avg_softmax = []
-    for logits in all_logits:
-        softmax = [F.softmax(logit, dim=1) for logit in logits]
-        avg_softmax.append(sum(softmax) / m)
-    return avg_softmax
-
 def train_epoch(net, trainloader, optimizer, epoch, attacker):
     net.train()
     requires_grad_(net, True)
@@ -196,7 +172,7 @@ def train_epoch(net, trainloader, optimizer, epoch, attacker):
 
             # -------- compute the ce loss via self-paced circular-teaching
             threshold = log10_scheduler(current_epoch=epoch, total_epoch=args.epochs, num_classes=args.num_classes, lbd_last=args.lbdlast)
-            loss_ce, all_losses, loss_mixup = ct_loss(net, b_data, b_data_adv, noises, b_label, args.num_classes, args.num_noise_vec, args.eps, threshold)
+            loss_ce, all_losses, loss_mixup = ct_mix_loss(net, b_data, b_data_adv, noises, b_label, args.num_classes, args.num_noise_vec, args.eps, threshold)
             for idx in range(args.num_heads):
                 losses_ce[idx].update(all_losses[idx].float().item(), b_data.size(0))
 
