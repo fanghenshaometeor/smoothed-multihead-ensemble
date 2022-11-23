@@ -24,21 +24,20 @@ torch.set_default_tensor_type(torch.FloatTensor)
 # ======== options ==============
 parser = argparse.ArgumentParser(description='Certify m-head ensemble')
 # -------- file param. --------------
-parser.add_argument('--data_dir',type=str,default='/data/CIFAR10/',help='file path for data')
-parser.add_argument('--logs_dir',type=str,default='./logs/',help='folder to store logs')
+parser.add_argument('--data_dir',type=str,default='./data/CIFAR10/',help='data directory')
+parser.add_argument('--logs_dir',type=str,default='./logs/',help='logs directory')
 parser.add_argument('--dataset',type=str,default='CIFAR10',help='data set name')
 parser.add_argument('--arch',type=str,default='vgg16',help='model architecture')
 parser.add_argument('--model_path',type=str,default='./save/CIFAR10-VGG.pth',help='saved model path')
-# -------- training param. ----------
-parser.add_argument('--batch_size',type=int,default=128,help='batch size for training (default: 256)')
-parser.add_argument('--noise_sd',default=0.0,type=float,help="standard deviation of Gaussian noise for data augmentation")
 # -------- certify --------
+parser.add_argument('--noise_sd',default=0.0,type=float,help="standard deviation of Gaussian noise")
+parser.add_argument('--batch_size',type=int,default=128,help='batch size for sampling noises')
 parser.add_argument("--skip", type=int, default=1, help="how many examples to skip")
 parser.add_argument("--max", type=int, default=-1, help="stop after this many examples")
-parser.add_argument("--split", choices=["train", "test"], default="test", help="train or test set")
 parser.add_argument("--N0", type=int, default=100)
 parser.add_argument("--N", type=int, default=100000, help="number of samples to use")
 parser.add_argument("--alpha", type=float, default=0.001, help="failure probability")
+# -------- mhead --------
 parser.add_argument('--num_heads',type=int,default=10,help='number of orthogonal paths')
 args = parser.parse_args()
 
