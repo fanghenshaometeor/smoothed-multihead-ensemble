@@ -18,7 +18,7 @@ def log10_scheduler(current_epoch, total_epoch, num_classes, lbd_last=0.5):
 
     return - math.log(a * current_epoch + b, 10)
 
-def ct_loss(all_logits_chunk, label, eps, threshold=0.5):
+def ct_loss(all_logits_chunk, label, threshold=0.5):
     
     num_heads = len(all_logits_chunk)
     m = len(all_logits_chunk[0])
@@ -54,17 +54,7 @@ def ct_loss(all_logits_chunk, label, eps, threshold=0.5):
 
     # -------- weighted head loss
     if num_heads > 1:
-        with torch.no_grad():
-            _, best_head_idx = torch.stack(losses, dim=-1).min(-1)
-            best_head_idx = int(best_head_idx.cpu().numpy().squeeze())
-
-            # Occasionally randomly choose a head to avoid idle heads
-            if np.random.binomial(1, 0.01):
-                best_head_idx = np.random.choice(range(num_heads))
-            
-            coeffs_head  = [eps / (num_heads - 1) for _ in range(num_heads)]
-            coeffs_head[best_head_idx] = 1 - eps
-        loss_ce = sum([losses[idx]*coeffs_head[idx] for idx in range(num_heads)])
+        loss_ce = sum(losses) / num_heads
     else:
         assert False, "number of heads should be greater than 1."
 

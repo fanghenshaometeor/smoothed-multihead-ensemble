@@ -43,13 +43,12 @@ parser.add_argument('--arch',type=str,default='vgg16',help='model architecture')
 parser.add_argument('--num_heads',type=int,default=10,help='number of heads')
 parser.add_argument('--num_noise_vec',default=2,type=int,help="number of noise vectors. `m` in the paper.")
 parser.add_argument('--lbdlast',type=float,default=0.5,help='the last value of lambda')
-parser.add_argument('--eps',type=float,default=0.8,help='epsilon to control weight distribution')
 
 args = parser.parse_args()
 
 # ======== log writer init. ========
 datanoise='noise-'+str(args.noise_sd)
-hyperparam='h-'+str(args.num_heads)+'-eps-'+str(args.eps)+'-m-'+str(args.num_noise_vec)+'-lbdlast-'+str(args.lbdlast)
+hyperparam='h-'+str(args.num_heads)+'-m-'+str(args.num_noise_vec)+'-lbdlast-'+str(args.lbdlast)
 writer = SummaryWriter(os.path.join(args.runs_dir,args.dataset,args.arch,datanoise,hyperparam+'/'))
 if not os.path.exists(os.path.join(args.save_dir,args.dataset,args.arch,datanoise,hyperparam)):
     os.makedirs(os.path.join(args.save_dir,args.dataset,args.arch,datanoise,hyperparam))
@@ -146,7 +145,7 @@ def train_epoch(net, trainloader, optimizer, epoch):
 
             # -------- compute the ce loss via self-paced circular-teaching
             threshold = log10_scheduler(current_epoch=epoch, total_epoch=args.epochs, num_classes=args.num_classes, lbd_last=args.lbdlast)
-            loss_ce, all_losses = ct_loss(all_logits_chunk, b_label, args.eps, threshold)
+            loss_ce, all_losses = ct_loss(all_logits_chunk, b_label, threshold)
             for idx in range(args.num_heads):
                 losses_ce[idx].update(all_losses[idx].float().item(), b_data.size(0))
             
