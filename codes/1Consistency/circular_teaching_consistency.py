@@ -70,8 +70,8 @@ def ct_con_loss(all_logits_chunk, label, threshold, lbd, eta=0.5):
         loss_kl_one_head = [kl_div(logit, avg_softmax[head_idx]) for logit in logits_chunk]
         loss_kl_one_head = sum(loss_kl_one_head)/m * coeffs_spl[head_idx-1].squeeze()
         loss_ent_one_head = entropy(avg_softmax[head_idx]) * coeffs_spl[head_idx-1].squeeze()
-        losses_consistency.append(lbd * loss_kl_one_head + eta * loss_ent_one_head)    
-    loss_consistency = sum([losses_consistency[idx].mean()*coeffs_head[idx] for idx in range(num_heads)])
+        losses_consistency.append(lbd * loss_kl_one_head + eta * loss_ent_one_head)
+    loss_consistency = sum([losses_consistency[idx].mean() for idx in range(num_heads)]) / num_heads
     
 
     return loss_ce, losses, loss_consistency

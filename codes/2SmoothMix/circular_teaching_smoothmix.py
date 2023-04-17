@@ -92,7 +92,7 @@ def ct_mix_loss(net, b_data, b_data_adv, noises, label, num_classes, num_noise_v
     ###########################################################################################################
     # -------- get clean avg. softmax for each head
     clean_avg_sm = _avg_softmax(all_logits_c_chunk)
-    clean_avg_sm = sum([clean_avg_sm[idx]*coeffs_head[idx] for idx in range(num_heads)])
+    clean_avg_sm = sum(clean_avg_sm) / num_heads
 
     # -------- create mixed data
     in_mix, targets_mix = _mixup_data(b_data, b_data_adv, clean_avg_sm, num_classes)
@@ -106,7 +106,7 @@ def ct_mix_loss(net, b_data, b_data_adv, noises, label, num_classes, num_noise_v
         loss_mix_one_head = [F.kl_div(logits_mix, targets_mix, reduction='none').sum(1) for logits_mix in logits_mix_chunk]
         loss_mix_one_head = sum(loss_mix_one_head)/m * coeffs_spl[head_idx-1].squeeze()
         losses_mix.append(loss_mix_one_head)
-    loss_mix = sum([losses_mix[idx].mean()*coeffs_head[idx] for idx in range(num_heads)])
+    loss_mix = sum([losses_mix[idx].mean() for idx in range(num_heads)]) / num_heads
 
     return loss_ce, losses, loss_mix
 
