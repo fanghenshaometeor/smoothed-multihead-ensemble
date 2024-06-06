@@ -19,10 +19,10 @@ SPACTE is compatible with all single-model-based certified defenses, among which
 - SmoothMix (NeurIPS'21): the SOTA data-augmentation-based certified defense. [[paper](https://arxiv.org/abs/2111.09277), [code](https://github.com/jh-jeong/smoothmix)]
 
 Accordingly, this repo is organized based on the 3 defenses.
-- [codes/](./codes/) contains the codes for training SPACTE with base methods Gaussian ([codes/0Gaussian/](./codes/0Gaussian)), Consistency ([codes/1Consistency/](./codes/1Consistency)) and SmoothMix ([codes/2SmoothMix/](./codes/2SmoothMix)), respectively.
+- [code/](./code/) contains the code for training SPACTE with base methods Gaussian ([code/0Gaussian/](./code/0Gaussian)), Consistency ([code/1Consistency/](./code/1Consistency)) and SmoothMix ([code/2SmoothMix/](./code/2SmoothMix)), respectively.
 - [logs_certification/](./logs_certification) provides the corresponding certification log data of our SPACTE models.
 
-For example, take a close look at the files in [codes/0Gaussian/](./codes/0Gaussian):
+For example, take a close look at the files in [code/0Gaussian/](./code/0Gaussian):
 1. `model/*_mhead.py`: model definitions of the multi-head DNN
 2. `circular_teaching.py`: main codes of SPACTE
 3. `core_mhead.py`: smoothed classifier of the multi-head DNN
@@ -47,7 +47,7 @@ Let us see an example on how to train and certifiy a 5-head ResNet-110 via SPACT
 ### Training and certification
 ```
 cd Circular-teaching
-cd codes/0Gaussian
+cd code/0Gaussian
 # training
 CUDA_VISIBLE_DEVICES=0 python train.py --arch R110 --dataset CIFAR10 --data_dir $data_dir$ --noise_sd 0.25 --num_heads 5 --num_noise_vec 2 --lbdlast 1.2
 # certification
